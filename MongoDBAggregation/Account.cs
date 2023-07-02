@@ -24,8 +24,9 @@ namespace MongoDBAggregation
         [BsonElement("account_type")]
         public string AccountType { get; set; }
 
+        [BsonRepresentation(BsonType.Decimal128)]
         [BsonElement("balance")]
-        public double Balance { get; set; }
+        public decimal Balance { get; set; }
 
         public static List<BsonDocument> AccountBsonDocuments()
         {

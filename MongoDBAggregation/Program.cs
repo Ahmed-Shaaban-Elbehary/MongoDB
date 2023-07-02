@@ -19,6 +19,7 @@ var bsoncollection = database.GetCollection<BsonDocument>("Account");
 //Console.WriteLine(result.ToString());
 
 //Aggregation $match & #group Stages.
+
 /*
 var matchStage = Builders<Account>.Filter.Lte(a => a.Balance, 750000);
 
@@ -49,4 +50,42 @@ foreach (var item in aggregatedList)
 }
 */
 
-// Aggregation $sort & #project Stages.
+// Aggregation $sort & #projection Stages.
+
+#region Sort Stage
+//var matchStage = Builders<Account>.Filter.Lte(a => a.Balance, 1000);
+//var aggregate = accountcollection.Aggregate()
+//    .Match(matchStage)
+//    .SortByDescending(a => a.Balance);
+
+
+//var matchStage = Builders<BsonDocument>.Filter.Lte("balance", 1000);
+//var sort = Builders<BsonDocument>.Sort.Ascending("balance");
+//var aggregate = bsoncollection.Aggregate()
+//    .Match(matchStage)
+//    .Sort(sort);
+#endregion Sort Stage
+
+#region Projection Stage
+var matchStage = Builders<Account>.Filter.Gte(a => a.Balance, 10000);
+var projectionStage = Builders<Account>.Projection.Expression(a =>
+    new
+    {
+        AccountType = a.AccountType,
+        AccountHolder = a.AccountHolder,
+        Balance = a.Balance,
+        GBP = (a.Balance / 1.30M).ToString()
+    });
+
+var aggregate = accountcollection.Aggregate()
+    .Match(matchStage)
+    .SortByDescending(a => a.Balance)
+    .Project(projectionStage);
+#endregion Projection Stage
+
+var result = aggregate.ToList();
+
+foreach (var item in result)
+{
+    Console.WriteLine(item.ToString());
+}
